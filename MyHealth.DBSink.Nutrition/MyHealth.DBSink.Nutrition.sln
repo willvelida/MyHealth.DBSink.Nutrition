@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31025.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition", "MyHealth.DBSink.Nutrition\MyHealth.DBSink.Nutrition.csproj", "{30488B9E-CDCB-4D93-A6FB-4B8753D86294}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition.UnitTests", "MyHealth.DBSink.Nutrition.UnitTests\MyHealth.DBSink.Nutrition.UnitTests.csproj", "{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30488B9E-CDCB-4D93-A6FB-4B8753D86294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30488B9E-CDCB-4D93-A6FB-4B8753D86294}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30488B9E-CDCB-4D93-A6FB-4B8753D86294}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30488B9E-CDCB-4D93-A6FB-4B8753D86294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27445B11-14DB-41BB-AA79-C0C1CDC78F24}
+	EndGlobalSection
+EndGlobal
