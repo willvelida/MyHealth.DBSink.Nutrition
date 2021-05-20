@@ -33,7 +33,19 @@ namespace MyHealth.DBSink.Nutrition.Functions
             {
                 var nutritionDocument = JsonConvert.DeserializeObject<mdl.Nutrition>(mySbMsg);
 
-                await _nutritionDbService.AddNutritionDocument(nutritionDocument);
+                logger.LogInformation($"Checking database for existing Food Log record dated {nutritionDocument.NutritionDate}");
+                var existingNutritionLog = await _nutritionDbService.RetrieveNutritionEnvelope(nutritionDocument.NutritionDate);
+                if (existingNutritionLog == null)
+                {
+                    logger.LogInformation($"No existing record for {nutritionDocument.NutritionDate}. Adding new log to database");
+                    await _nutritionDbService.AddNutritionDocument(nutritionDocument);
+                }
+                else
+                {
+                    logger.LogInformation($"Food log for date {nutritionDocument.NutritionDate} exists. Attempting to update record with latest values");
+                    await _nutritionDbService.ReplaceNutritionDocument(existingNutritionLog);
+                }
+
                 logger.LogInformation($"Nutrition document with {nutritionDocument.NutritionDate} has been persisted");
             }
             catch (Exception ex)
