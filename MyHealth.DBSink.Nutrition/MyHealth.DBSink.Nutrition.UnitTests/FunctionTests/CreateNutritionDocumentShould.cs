@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -40,15 +41,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         public async Task AddActivityDocumentSuccessfullyWhenExistingNutritionDocumentIsNotFound()
         {
             // Arrange
-            var testNutritionEnvelope = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    NutritionDate = "2020-12-31"
-                },
-                DocumentType = "Test"
-            };
+            var fixture = new Fixture();
+            var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
 
             var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
 
@@ -69,15 +63,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         public async Task ReplaceNutritionDocumentSuccessfullyWhenExistingDocumentIsRetrieved()
         {
             // Arrange
-            var existingTestNutritionEnvelope = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    NutritionDate = "2020-12-31"
-                },
-                DocumentType = "Test"
-            };
+            var fixture = new Fixture();
+            var existingTestNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
 
             var newTestNutritionEnvelope = new mdl.Nutrition
             {
@@ -102,15 +89,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         public async Task CatchAndThrowExceptionWhenRetrieveNutritionEnvelopeThrowsException()
         {
             // Arrange
-            var testNutritionEnvelope = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    NutritionDate = "2020-12-31"
-                },
-                DocumentType = "Test"
-            };
+            var fixture = new Fixture();
+            var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
 
             var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
 
@@ -129,15 +109,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         [Fact]
         public async Task CatchAndThrowExceptionWhenReplaceNutritionDocumentThrowsException()
         {
-            var existingTestNutritionEnvelope = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    NutritionDate = "2020-12-31"
-                },
-                DocumentType = "Test"
-            };
+            var fixture = new Fixture();
+            var existingTestNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
 
             var newTestNutritionEnvelope = new mdl.Nutrition
             {
@@ -162,15 +135,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         public async Task CatchAndLogErrorWhenAddActivityDocumentThrowsException()
         {
             // Arrange
-            var testNutritionEnvelope = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    NutritionDate = "2020-12-31"
-                },
-                DocumentType = "Test"
-            };
+            var fixture = new Fixture();
+            var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
 
             var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
 

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture;
+using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -37,11 +38,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
         public async Task AddNutritionDocumentWhenCreateItemAsyncIsCalled()
         {
             // Arrange
-            mdl.Nutrition testNutritionDocument = new mdl.Nutrition
-            {
-                Carbs = 100
-            };
-
+            var fixutre = new Fixture();
+            mdl.Nutrition testNutritionDocument = fixutre.Create<mdl.Nutrition>();
 
             _mockContainer.SetupCreateItemAsync<mdl.Nutrition>();
 
@@ -61,11 +59,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
         public async Task ThrowExceptionWhenCreateItemAsyncCallFails()
         {
             // Arrange
-            mdl.Nutrition testNutritionDocument = new mdl.Nutrition
-            {
-                Carbs = 100
-            };
-
+            var fixutre = new Fixture();
+            mdl.Nutrition testNutritionDocument = fixutre.Create<mdl.Nutrition>();
 
             _mockContainer.SetupCreateItemAsync<mdl.Nutrition>();
             _mockContainer.Setup(x => x.CreateItemAsync(
@@ -136,7 +131,6 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
                 It.IsAny<QueryRequestOptions>()))
                 .Throws(new Exception());
 
-
             // Act
             Func<Task> responseAction = async () => await _sut.RetrieveNutritionEnvelope("2021-05-01");
 
@@ -147,17 +141,8 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
         [Fact]
         public async Task ReplaceNutritionDocumentWhenReplaceItemAsyncIsCalled()
         {
-            mdl.NutritionEnvelope testNutritionEnvelopeDocument = new mdl.NutritionEnvelope
-            {
-                Id = Guid.NewGuid().ToString(),
-                Nutrition = new mdl.Nutrition
-                {
-                    Carbs = 100,
-                    NutritionDate = "2021-05-01"
-                },
-                DocumentType = "Food"
-            };
-
+            var fixutre = new Fixture();
+            mdl.NutritionEnvelope testNutritionEnvelopeDocument = fixutre.Create<mdl.NutritionEnvelope>();
 
             _mockContainer.SetupReplaceItemAsync<mdl.NutritionEnvelope>();
 
