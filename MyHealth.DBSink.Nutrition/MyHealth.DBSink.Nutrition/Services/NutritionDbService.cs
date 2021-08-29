@@ -24,20 +24,13 @@ namespace MyHealth.DBSink.Nutrition.Services
             _myHealthContainer = _cosmosClient.GetContainer(_configuration["DatabaseName"], _configuration["ContainerName"]);
         }
 
-        public async Task AddNutritionDocument(mdl.Nutrition nutrition)
+        public async Task AddNutritionDocument(mdl.NutritionEnvelope nutritionEnvelope)
         {
             try
             {
                 ItemRequestOptions itemRequestOptions = new ItemRequestOptions
                 {
                     EnableContentResponseOnWrite = false
-                };
-
-                mdl.NutritionEnvelope nutritionEnvelope = new mdl.NutritionEnvelope
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Nutrition = nutrition,
-                    DocumentType = "Nutrition"
                 };
 
                 await _myHealthContainer.CreateItemAsync(
@@ -50,51 +43,6 @@ namespace MyHealth.DBSink.Nutrition.Services
             {
                 throw ex;
             }
-        }
-
-        public async Task ReplaceNutritionDocument(NutritionEnvelope existingNutritionEnvelope)
-        {
-            try
-            {
-                ItemRequestOptions itemRequestOptions = new ItemRequestOptions
-                {
-                    EnableContentResponseOnWrite = false
-                };
-
-                await _myHealthContainer.ReplaceItemAsync(
-                    existingNutritionEnvelope,
-                    existingNutritionEnvelope.Id,
-                    new PartitionKey(existingNutritionEnvelope.DocumentType),
-                    itemRequestOptions);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public async Task<NutritionEnvelope> RetrieveNutritionEnvelope(string nutritionDate)
-        {
-            try
-            {
-                QueryDefinition query = new QueryDefinition("SELECT * FROM Records c WHERE c.DocumentType = 'Nutrition' AND c.Nutrition.NutritionDate = @nutritionLogDate")
-                    .WithParameter("@nutritionLogDate", nutritionDate);
-                List<NutritionEnvelope> nutritionEnvelopes = new List<NutritionEnvelope>();
-
-                FeedIterator<NutritionEnvelope> feedIterator = _myHealthContainer.GetItemQueryIterator<NutritionEnvelope>(query);
-
-                while (feedIterator.HasMoreResults)
-                {
-                    FeedResponse<NutritionEnvelope> queryResponse = await feedIterator.ReadNextAsync();
-                    nutritionEnvelopes.AddRange(queryResponse.Resource);
-                }
-
-                return nutritionEnvelopes.FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        }       
     }
 }

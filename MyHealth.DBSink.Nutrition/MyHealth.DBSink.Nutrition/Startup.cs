@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MyHealth.Common;
 using MyHealth.DBSink.Nutrition;
 using MyHealth.DBSink.Nutrition.Functions;
+using MyHealth.DBSink.Nutrition.Mappers;
 using MyHealth.DBSink.Nutrition.Services;
 using System.IO;
 
@@ -40,6 +41,7 @@ namespace MyHealth.DBSink.Nutrition
                 return new ServiceBusHelpers(config["ServiceBusConnectionString"]);
             });
             builder.Services.AddScoped<INutritionDbService, NutritionDbService>();
+            builder.Services.AddScoped<INutritionEnvelopeMapper, NutritionEnvelopeMapper>();
         }
     }
 }

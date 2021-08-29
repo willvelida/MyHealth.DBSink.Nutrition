@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MyHealth.Common;
 using MyHealth.DBSink.Nutrition.Functions;
+using MyHealth.DBSink.Nutrition.Mappers;
 using MyHealth.DBSink.Nutrition.Services;
 using Newtonsoft.Json;
 using System;
@@ -19,6 +20,7 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         private Mock<ILogger> _mockLogger;
         private Mock<IConfiguration> _mockConfiguration;
         private Mock<INutritionDbService> _mockNutritionDbService;
+        private Mock<INutritionEnvelopeMapper> _mockNutritionEnvelopeMapper;
         private Mock<IServiceBusHelpers> _mockServiceBusHelpers;
 
         private CreateNutritionDocument _func;
@@ -29,11 +31,13 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
             _mockLogger = new Mock<ILogger>();
             _mockConfiguration.Setup(x => x["ServiceBusConnectionString"]).Returns("ServiceBusConnectionString");
             _mockNutritionDbService = new Mock<INutritionDbService>();
+            _mockNutritionEnvelopeMapper = new Mock<INutritionEnvelopeMapper>();
             _mockServiceBusHelpers = new Mock<IServiceBusHelpers>();
 
             _func = new CreateNutritionDocument(
                 _mockConfiguration.Object,
                 _mockNutritionDbService.Object,
+                _mockNutritionEnvelopeMapper.Object,
                 _mockServiceBusHelpers.Object);
         }
 
@@ -42,112 +46,39 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.FunctionTests
         {
             // Arrange
             var fixture = new Fixture();
+            var testNutrition = fixture.Create<mdl.Nutrition>();
             var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
+            var testActivityDocumentString = JsonConvert.SerializeObject(testNutrition);
 
-            var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
-
-            _mockNutritionDbService.Setup(x => x.RetrieveNutritionEnvelope(testNutritionEnvelope.Nutrition.NutritionDate)).Returns(Task.FromResult<mdl.NutritionEnvelope>(null));
-            _mockNutritionDbService.Setup(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>())).Returns(Task.CompletedTask);
+            _mockNutritionEnvelopeMapper.Setup(x => x.MapNutritionToNutritionEnvelope(It.IsAny<mdl.Nutrition>())).Returns(testNutritionEnvelope);
+            _mockNutritionDbService.Setup(x => x.AddNutritionDocument(It.IsAny<mdl.NutritionEnvelope>())).Returns(Task.CompletedTask);
 
             // Act
             await _func.Run(testActivityDocumentString, _mockLogger.Object);
 
             // Assert
-            _mockNutritionDbService.Verify(x => x.RetrieveNutritionEnvelope(It.IsAny<string>()), Times.Once);
-            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>()), Times.Once);
-            _mockNutritionDbService.Verify(x => x.ReplaceNutritionDocument(It.IsAny<mdl.NutritionEnvelope>()), Times.Never);
+            _mockNutritionEnvelopeMapper.Verify(x => x.MapNutritionToNutritionEnvelope(It.IsAny<mdl.Nutrition>()), Times.Once);
+            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.NutritionEnvelope>()), Times.Once);
             _mockServiceBusHelpers.Verify(x => x.SendMessageToQueue(It.IsAny<string>(), It.IsAny<Exception>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task ReplaceNutritionDocumentSuccessfullyWhenExistingDocumentIsRetrieved()
-        {
-            // Arrange
-            var fixture = new Fixture();
-            var existingTestNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
-
-            var newTestNutritionEnvelope = new mdl.Nutrition
-            {
-                NutritionDate = "2020-12-31",
-            };
-
-            var testActivityDocumentString = JsonConvert.SerializeObject(existingTestNutritionEnvelope);
-
-            _mockNutritionDbService.Setup(x => x.RetrieveNutritionEnvelope(It.IsAny<string>())).ReturnsAsync(existingTestNutritionEnvelope);
-            _mockNutritionDbService.Setup(x => x.ReplaceNutritionDocument(existingTestNutritionEnvelope)).Returns(Task.CompletedTask);
-
-            // Act
-            await _func.Run(testActivityDocumentString, _mockLogger.Object);
-
-            // Assert
-            _mockNutritionDbService.Verify(x => x.RetrieveNutritionEnvelope(It.IsAny<string>()), Times.Once);
-            _mockNutritionDbService.Verify(x => x.ReplaceNutritionDocument(It.IsAny<mdl.NutritionEnvelope>()), Times.Once);
-            _mockServiceBusHelpers.Verify(x => x.SendMessageToQueue(It.IsAny<string>(), It.IsAny<Exception>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task CatchAndThrowExceptionWhenRetrieveNutritionEnvelopeThrowsException()
-        {
-            // Arrange
-            var fixture = new Fixture();
-            var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
-
-            var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
-
-            _mockNutritionDbService.Setup(x => x.RetrieveNutritionEnvelope(It.IsAny<string>())).ThrowsAsync(It.IsAny<Exception>());
-
-            // Act
-            Func<Task> responseAction = async () => await _func.Run(testActivityDocumentString, _mockLogger.Object);
-
-            // Assert
-            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>()), Times.Never);
-            _mockNutritionDbService.Verify(x => x.ReplaceNutritionDocument(It.IsAny<mdl.NutritionEnvelope>()), Times.Never);
-            await responseAction.Should().ThrowAsync<Exception>();
-            _mockServiceBusHelpers.Verify(x => x.SendMessageToQueue(It.IsAny<string>(), It.IsAny<Exception>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task CatchAndThrowExceptionWhenReplaceNutritionDocumentThrowsException()
-        {
-            var fixture = new Fixture();
-            var existingTestNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
-
-            var newTestNutritionEnvelope = new mdl.Nutrition
-            {
-                NutritionDate = "2020-12-31",
-            };
-
-            var testActivityDocumentString = JsonConvert.SerializeObject(existingTestNutritionEnvelope);
-
-            _mockNutritionDbService.Setup(x => x.RetrieveNutritionEnvelope(It.IsAny<string>())).ReturnsAsync(existingTestNutritionEnvelope);
-            _mockNutritionDbService.Setup(x => x.ReplaceNutritionDocument(It.IsAny<mdl.NutritionEnvelope>())).ThrowsAsync(It.IsAny<Exception>());
-
-            // Act
-            Func<Task> responseAction = async () => await _func.Run(testActivityDocumentString, _mockLogger.Object);
-
-            // Assert
-            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>()), Times.Never);
-            await responseAction.Should().ThrowAsync<Exception>();
-            _mockServiceBusHelpers.Verify(x => x.SendMessageToQueue(It.IsAny<string>(), It.IsAny<Exception>()), Times.Once);
-        }
+        }       
 
         [Fact]
         public async Task CatchAndLogErrorWhenAddActivityDocumentThrowsException()
         {
             // Arrange
             var fixture = new Fixture();
+            var testNutrition = fixture.Create<mdl.Nutrition>();
             var testNutritionEnvelope = fixture.Create<mdl.NutritionEnvelope>();
+            var testActivityDocumentString = JsonConvert.SerializeObject(testNutrition);
 
-            var testActivityDocumentString = JsonConvert.SerializeObject(testNutritionEnvelope);
-
-            _mockNutritionDbService.Setup(x => x.RetrieveNutritionEnvelope(testNutritionEnvelope.Nutrition.NutritionDate)).Returns(Task.FromResult<mdl.NutritionEnvelope>(null));
-            _mockNutritionDbService.Setup(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>())).ThrowsAsync(It.IsAny<Exception>());
+            _mockNutritionEnvelopeMapper.Setup(x => x.MapNutritionToNutritionEnvelope(It.IsAny<mdl.Nutrition>())).Returns(testNutritionEnvelope);
+            _mockNutritionDbService.Setup(x => x.AddNutritionDocument(It.IsAny<mdl.NutritionEnvelope>())).ThrowsAsync(It.IsAny<Exception>());
 
             // Act
             Func<Task> responseAction = async () => await _func.Run(testActivityDocumentString, _mockLogger.Object);
 
             // Assert
-            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.Nutrition>()), Times.Never);
+            _mockNutritionDbService.Verify(x => x.AddNutritionDocument(It.IsAny<mdl.NutritionEnvelope>()), Times.Never);
             await responseAction.Should().ThrowAsync<Exception>();
             _mockServiceBusHelpers.Verify(x => x.SendMessageToQueue(It.IsAny<string>(), It.IsAny<Exception>()), Times.Once);
         }
