@@ -99,4 +99,4 @@ stages:
                     appType: functionAppLinux
                     appName: $(functionAppName)                   
                     package: '$(Pipeline.Workspace)/drop/MyHealth.DBSink.Nutrition.zip'
-                    appSettings: '-FUNCTIONS_WORKER_RUNTIME "dotnet" -FUNCTIONS_EXTENSION_VERSION "~3" -CosmosDBConnectionString "$(cosmosdbconnectionstring)" -ServiceBusConnectionString "$(servicebusstorageconnectionstring)" -DatabaseName "MyHealthDB" -ContainerName "Records" -APPINSIGHTS_INSTRUMENTATIONKEY "2fc597df-fc6b-4b20-ac9c-ee7240b70704" -ExceptionQueue "myhealthexceptionqueue"'
+                    appSettings: '-FUNCTIONS_WORKER_RUNTIME "dotnet" -FUNCTIONS_EXTENSION_VERSION "~3" -CosmosDBConnectionString "$(serverlesscosmosdbconnectionstring)" -ServiceBusConnectionString "$(servicebusstorageconnectionstring)" -DatabaseName "MyHealthDB" -ContainerName "Records" -APPINSIGHTS_INSTRUMENTATIONKEY "2fc597df-fc6b-4b20-ac9c-ee7240b70704" -ExceptionQueue "myhealthexceptionqueue"'
