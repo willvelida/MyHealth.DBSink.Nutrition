@@ -6,13 +6,18 @@ using Microsoft.Extensions.Logging;
 using MyHealth.Common;
 using MyHealth.DBSink.Nutrition;
 using MyHealth.DBSink.Nutrition.Functions;
-using MyHealth.DBSink.Nutrition.Mappers;
+using MyHealth.DBSink.Nutrition.Repository;
+using MyHealth.DBSink.Nutrition.Repository.Interfaces;
 using MyHealth.DBSink.Nutrition.Services;
+using MyHealth.DBSink.Nutrition.Services.Interfaces;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace MyHealth.DBSink.Nutrition
 {
+    [ExcludeFromCodeCoverage]
     public class Startup : FunctionsStartup
     {
         private static ILogger _logger;
@@ -32,7 +37,12 @@ namespace MyHealth.DBSink.Nutrition
             builder.Services.AddSingleton(sp =>
             {
                 IConfiguration config = sp.GetService<IConfiguration>();
-                return new CosmosClient(config["CosmosDBConnectionString"]);
+                CosmosClientOptions cosmosClientOptions = new CosmosClientOptions
+                {
+                    MaxRetryAttemptsOnRateLimitedRequests = 3,
+                    MaxRetryWaitTimeOnRateLimitedRequests = TimeSpan.FromSeconds(60)
+                };
+                return new CosmosClient(config["CosmosDBConnectionString"], cosmosClientOptions);
             });
 
             builder.Services.AddSingleton<IServiceBusHelpers>(sp =>
@@ -40,8 +50,8 @@ namespace MyHealth.DBSink.Nutrition
                 IConfiguration config = sp.GetService<IConfiguration>();
                 return new ServiceBusHelpers(config["ServiceBusConnectionString"]);
             });
-            builder.Services.AddScoped<INutritionDbService, NutritionDbService>();
-            builder.Services.AddScoped<INutritionEnvelopeMapper, NutritionEnvelopeMapper>();
+            builder.Services.AddTransient<INutritionRepository, NutritionRepository>();
+            builder.Services.AddTransient<INutritionService, NutritionService>();
         }
     }
 }

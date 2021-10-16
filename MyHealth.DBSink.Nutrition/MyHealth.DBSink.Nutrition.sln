@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition", "MyHealth.DBSink.Nutrition\MyHealth.DBSink.Nutrition.csproj", "{30488B9E-CDCB-4D93-A6FB-4B8753D86294}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHealth.DBSink.Nutrition", "MyHealth.DBSink.Nutrition\MyHealth.DBSink.Nutrition.csproj", "{30488B9E-CDCB-4D93-A6FB-4B8753D86294}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition.UnitTests", "MyHealth.DBSink.Nutrition.UnitTests\MyHealth.DBSink.Nutrition.UnitTests.csproj", "{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHealth.DBSink.Nutrition.UnitTests", "MyHealth.DBSink.Nutrition.UnitTests\MyHealth.DBSink.Nutrition.UnitTests.csproj", "{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition.Repository", "MyHealth.DBSink.Nutrition.Repository\MyHealth.DBSink.Nutrition.Repository.csproj", "{6BAED8D6-A26F-41DF-91A7-A1C2C2EFACB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHealth.DBSink.Nutrition.Services", "MyHealth.DBSink.Nutrition.Services\MyHealth.DBSink.Nutrition.Services.csproj", "{FE268B86-F39F-4F16-8713-8AE49938A704}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D42FD51-B5C2-4B55-A432-D3B70BBD5104}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BAED8D6-A26F-41DF-91A7-A1C2C2EFACB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BAED8D6-A26F-41DF-91A7-A1C2C2EFACB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BAED8D6-A26F-41DF-91A7-A1C2C2EFACB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BAED8D6-A26F-41DF-91A7-A1C2C2EFACB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE268B86-F39F-4F16-8713-8AE49938A704}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE268B86-F39F-4F16-8713-8AE49938A704}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE268B86-F39F-4F16-8713-8AE49938A704}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE268B86-F39F-4F16-8713-8AE49938A704}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

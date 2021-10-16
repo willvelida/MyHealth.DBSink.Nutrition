@@ -2,8 +2,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyHealth.Common;
-using MyHealth.DBSink.Nutrition.Mappers;
-using MyHealth.DBSink.Nutrition.Services;
+using MyHealth.DBSink.Nutrition.Services.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -14,19 +13,16 @@ namespace MyHealth.DBSink.Nutrition.Functions
     public class CreateNutritionDocument
     {
         private readonly IConfiguration _configuration;
-        private readonly INutritionDbService _nutritionDbService;
-        private readonly INutritionEnvelopeMapper _nutritionEnvelopeMapper;
+        private readonly INutritionService _nutritionService;
         private readonly IServiceBusHelpers _serviceBusHelpers;
 
         public CreateNutritionDocument(
             IConfiguration configuration,
-            INutritionDbService nutritionDbService,
-            INutritionEnvelopeMapper nutritionEnvelopeMapper,
+            INutritionService nutritionService,
             IServiceBusHelpers serviceBusHelpers)
         {
             _configuration = configuration;
-            _nutritionDbService = nutritionDbService;
-            _nutritionEnvelopeMapper = nutritionEnvelopeMapper;
+            _nutritionService = nutritionService;
             _serviceBusHelpers = serviceBusHelpers;
         }
 
@@ -36,8 +32,8 @@ namespace MyHealth.DBSink.Nutrition.Functions
             try
             {
                 var nutrition = JsonConvert.DeserializeObject<mdl.Nutrition>(mySbMsg);
-                var nutritionEnvelope = _nutritionEnvelopeMapper.MapNutritionToNutritionEnvelope(nutrition);
-                await _nutritionDbService.AddNutritionDocument(nutritionEnvelope);
+                var nutritionEnvelope = _nutritionService.MapNutritionToNutritionEnvelope(nutrition);
+                await _nutritionService.AddNutritionDocument(nutritionEnvelope);
                 logger.LogInformation($"Nutrition document with {nutritionEnvelope.Date} has been persisted");
             }
             catch (Exception ex)

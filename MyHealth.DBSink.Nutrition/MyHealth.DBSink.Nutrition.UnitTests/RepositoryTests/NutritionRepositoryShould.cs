@@ -3,26 +3,25 @@ using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using MyHealth.DBSink.Nutrition.Services;
+using MyHealth.DBSink.Nutrition.Repository;
 using MyHealth.DBSink.Nutrition.UnitTests.TestHelpers;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using mdl = MyHealth.Common.Models;
 
-namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
+namespace MyHealth.DBSink.Nutrition.UnitTests.RepositoryTests
 {
-    public class NutritionDbServiceShould
+    public class NutritionRepositoryShould
     {
         private Mock<CosmosClient> _mockCosmosClient;
         private Mock<Container> _mockContainer;
         private Mock<IConfiguration> _mockConfiguration;
 
-        private NutritionDbService _sut;
+        private NutritionRepository _sut;
 
-        public NutritionDbServiceShould()
+        public NutritionRepositoryShould()
         {
             _mockCosmosClient = new Mock<CosmosClient>();
             _mockContainer = new Mock<Container>();
@@ -31,7 +30,7 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
             _mockConfiguration.Setup(x => x["DatabaseName"]).Returns("db");
             _mockConfiguration.Setup(x => x["ContainerName"]).Returns("col");
 
-            _sut = new NutritionDbService(_mockCosmosClient.Object, _mockConfiguration.Object);
+            _sut = new NutritionRepository(_mockCosmosClient.Object, _mockConfiguration.Object);
         }
 
         [Fact]
@@ -44,7 +43,7 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
             _mockContainer.SetupCreateItemAsync<mdl.NutritionEnvelope>();
 
             // Act
-            Func<Task> serviceAction = async () => await _sut.AddNutritionDocument(testNutritionDocument);
+            Func<Task> serviceAction = async () => await _sut.CreateNutrition(testNutritionDocument);
 
             // Assert
             await serviceAction.Should().NotThrowAsync<Exception>();
@@ -70,10 +69,10 @@ namespace MyHealth.DBSink.Nutrition.UnitTests.ServicesTests
                 It.IsAny<CancellationToken>())).ThrowsAsync(new Exception());
 
             // Act
-            Func<Task> serviceAction = async () => await _sut.AddNutritionDocument(testNutritionDocument);
+            Func<Task> serviceAction = async () => await _sut.CreateNutrition(testNutritionDocument);
 
             // Assert
             await serviceAction.Should().ThrowAsync<Exception>();
-        }        
+        }
     }
 }

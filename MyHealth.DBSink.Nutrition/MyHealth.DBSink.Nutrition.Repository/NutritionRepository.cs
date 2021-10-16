@@ -1,21 +1,19 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using MyHealth.Common.Models;
+using MyHealth.DBSink.Nutrition.Repository.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using mdl = MyHealth.Common.Models;
 
-namespace MyHealth.DBSink.Nutrition.Services
+namespace MyHealth.DBSink.Nutrition.Repository
 {
-    public class NutritionDbService : INutritionDbService
+    public class NutritionRepository : INutritionRepository
     {
         private readonly CosmosClient _cosmosClient;
         private readonly Container _myHealthContainer;
         private readonly IConfiguration _configuration;
 
-        public NutritionDbService(
+        public NutritionRepository(
             CosmosClient cosmosClient,
             IConfiguration configuration)
         {
@@ -24,7 +22,7 @@ namespace MyHealth.DBSink.Nutrition.Services
             _myHealthContainer = _cosmosClient.GetContainer(_configuration["DatabaseName"], _configuration["ContainerName"]);
         }
 
-        public async Task AddNutritionDocument(mdl.NutritionEnvelope nutritionEnvelope)
+        public async Task CreateNutrition(NutritionEnvelope nutritionEnvelope)
         {
             try
             {
@@ -43,6 +41,6 @@ namespace MyHealth.DBSink.Nutrition.Services
             {
                 throw ex;
             }
-        }       
+        }
     }
 }
